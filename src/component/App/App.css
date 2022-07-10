@@ -1,0 +1,22 @@
+.spin-loading {
+  margin: 20px 0;
+  margin-bottom: 20px;
+  padding: 30px 50px;
+  text-align: center;
+  border-radius: 4px;
+}
+.container {
+  max-width: 1010px;
+  margin: 0 auto;
+  min-width: 320px;
+  height: auto;
+  position: relative;
+  padding: 0 36px;
+  background-color: #fff;
+}
+.container .ant-layout {
+  margin-top: 2em;
+  min-height: 100vh;
+  background: #ffffff;
+  align-items: center;
+}
