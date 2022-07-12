@@ -1,4 +1,5 @@
 div .ant-card {
+  position: relative;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
 }
 div .card-date {
@@ -9,17 +10,16 @@ div .card-date {
   color: #827e7e;
 }
 div div .card-title {
-  padding-top: 1em;
   display: flex;
   margin-bottom: 0;
-  font-size: 20px;
+  font-weight: 400;
+  font-size: 18px;
 }
 div .card-tags {
-  margin-top: 0.5em;
   align-self: start;
   flex-wrap: wrap;
   display: flex;
-  gap: 10px;
+  gap: 5px;
   line-height: 15px;
   color: rgba(0, 0, 0, 0.65);
 }
@@ -27,19 +27,18 @@ div .card-tags .tag {
   background: #fafafa;
   border: 1px solid #d9d9d9;
   border-radius: 2px;
-  padding: 0.2em;
 }
 div .ant-card-body {
   display: grid;
   grid-template-columns: 0.4fr 1fr;
-  grid-column-gap: 10px;
+  grid-column-gap: 5px;
   padding: 0;
   padding-right: 1em;
 }
 
 .card-img {
-  width: 183px;
-  height: 281px;
+  width: 160px;
+  height: 253px;
   object-fit: cover;
   grid-row: 1/6;
   padding: 0;
@@ -50,6 +49,11 @@ div .ant-card-body {
   font-size: 14px;
   align-self: stretch;
   justify-self: stretch;
+}
+ul.ant-rate {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
 }
 
 @media (max-width: 450px) {

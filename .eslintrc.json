@@ -32,6 +32,7 @@
         "endOfLine": "auto"
       }
     ],
+    "import/no-named-as-default": 0,
     "linebreak-style": [0, "unix"],
     "quotes": ["error", "single"],
     "semi": [2, "always"],
