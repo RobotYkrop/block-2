@@ -18,6 +18,10 @@ export default class CinemaApi {
     return await this.getApi(`search/movie?${this._apiKey}&include_adult=false&page=${pageNumber}&query=${query}`);
   };
 
+  getRated = async (guestSessionToken, pageNumber = 1) => {
+    return await this.getApi(`guest_session/${guestSessionToken}/rated/movies?${this._apiKey}&page=${pageNumber}`);
+  };
+
   guestSession = async () => {
     return await this.getApi(`authentication/guest_session/new?${this._apiKey}`);
   };

@@ -1,5 +1,5 @@
 div .ant-card {
-  position: relative;
+  display: grid;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
 }
 div .card-date {
@@ -33,7 +33,6 @@ div .ant-card-body {
   grid-template-columns: 0.4fr 1fr;
   grid-column-gap: 5px;
   padding: 0;
-  padding-right: 1em;
 }
 
 .card-img {
@@ -50,10 +49,38 @@ div .ant-card-body {
   align-self: stretch;
   justify-self: stretch;
 }
-ul.ant-rate {
-  position: absolute;
-  bottom: 10px;
-  width: 100%;
+
+.ant-card-body:after,
+.ant-card-body:before {
+  display: none;
+}
+
+.card-popularity-count {
+  grid-column: 3/4;
+  grid-row: 1/2;
+  display: flex;
+  border: 3px solid #e90000;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  justify-self: end;
+  align-self: start;
+}
+
+.card-popularity-count.orange {
+  border-color: #e97e00;
+}
+
+.card-popularity-count.yellow {
+  border-color: #e9d100;
+}
+
+.card-popularity-count.green {
+  border-color: #66e900;
 }
 
 @media (max-width: 450px) {

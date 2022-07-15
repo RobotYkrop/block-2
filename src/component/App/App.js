@@ -3,20 +3,22 @@ import React from 'react';
 import { Spin, Alert, Pagination, Empty, Layout } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { Offline, Online } from 'react-detect-offline';
-import { set } from 'lodash';
+import store from 'store';
 
 import './App.css';
 import 'antd/dist/antd.min.css';
 import CinemaApi from '../CinemaApi/CinemaApi';
 import CinemaList from '../CinemaList/CinemaList';
 import Search from '../Search/Search';
+import HeaderTabs from '../HeaderTabs/Tabs';
 import { Provider } from '../CinemaContext/CinemaContext';
 
-export default class App extends React.Component {
+export default class App extends React.PureComponent {
   getApi = new CinemaApi();
   state = {
     movie: [],
     genresList: [],
+    ratedFilm: [],
     isLoading: true,
     isError: false,
     notFound: false,
@@ -28,6 +30,13 @@ export default class App extends React.Component {
   };
 
   componentDidMount() {
+    if (!store.get('guestSession')) {
+      this.getGuestSession();
+    } else {
+      this.setState({
+        guestSession: store.get('guestSession'),
+      });
+    }
     this.getMovies();
   }
 
@@ -75,10 +84,9 @@ export default class App extends React.Component {
     this.getApi
       .guestSession()
       .then((body) => {
-        set('guestSessionId', `${body.guest_session_id}`);
+        store.set('guestSession', `${body.guest_session_id}`);
         this.setState({
-          // eslint-disable-next-line react/no-unused-state
-          guestSessionId: body.guest_session_id,
+          guestSession: body.guest_session_id,
           isLoading: false,
         });
       })
@@ -132,12 +140,17 @@ export default class App extends React.Component {
   };
 
   changePage = (page) => {
+    const { tab } = this.state;
     this.setState(
       {
         numberPage: page,
       },
       () => {
-        this.searchMovies();
+        if (tab === '1') {
+          this.searchMovies();
+        } else {
+          this.getRated();
+        }
       }
     );
   };
@@ -176,6 +189,72 @@ export default class App extends React.Component {
     return arr;
   };
 
+  changeTab = (key) => {
+    if (key === '2') {
+      this.setState(
+        {
+          tab: key,
+          numberPage: 1,
+        },
+        () => {
+          this.getRated();
+        }
+      );
+    } else {
+      this.setState(
+        {
+          isLoading: false,
+          notFound: false,
+          tab: key,
+          numberPage: 1,
+        },
+        () => {
+          this.getMovies();
+        }
+      );
+    }
+  };
+
+  addRatedItemToList = (item) => {
+    const newItem = this.createMovie(item);
+
+    this.setState(({ ratedFilm }) => {
+      const newData = [...ratedFilm, newItem];
+      return {
+        ratedFilm: newData,
+        isLoading: false,
+      };
+    });
+  };
+
+  getRated = () => {
+    const { guestSession, numberPage } = this.state;
+    this.setState({
+      ratedFilm: [],
+      isLoading: true,
+      notFound: false,
+      isError: false,
+    });
+    this.getApi
+      .getRated(guestSession, numberPage)
+      .then((item) => {
+        this.setState({
+          totalPages: item.total_pages,
+          numberPage,
+        });
+        if (item.results.length === 0) {
+          this.setState({
+            isLoading: false,
+            notFound: true,
+          });
+        }
+        item.results.forEach((elm) => {
+          this.addRatedItemToList(elm);
+        });
+      })
+      .catch(this.onError);
+  };
+
   createMovie = (item) => {
     return {
       id: item.id,
@@ -184,37 +263,47 @@ export default class App extends React.Component {
       releaseDate: item.release_date ? format(parseISO(item.release_date), 'MMMM dd, yyyy') : 'no release date',
       overview: item.overview || 'Not overview',
       genres: this.mapGenresList(item.genre_ids),
+      rating: store.get(`${item.id}`) || item.rating || 'Not rating',
+      popularity: item.vote_average || 'Not rating',
     };
   };
 
   render() {
-    // fetch('https://api.themoviedb.org/3/movie/popular?api_key=c64d9dbabab69b4b9bb367af0f97bee2&language=en-US&page=1')
-    //   .then((res) => res.json())
-    //   .then((res) => console.log(res));
+    const { movie, isLoading, isError, numberPage, totalPages, notFound, guestSession, tab, ratedFilm } = this.state;
 
-    // this.getApi.getIdTagsList().then((body) => console.log([...body.genres]));
-    // this.getApi.guestSession().then((res) => console.log(res));
-
-    const { movie, isLoading, isError, numberPage, totalPages, notFound } = this.state;
-
-    const CinContext = { movie, isLoading, isError, numberPage, totalPages, notFound };
+    const CinContext = { movie, ratedFilm, tab, guestSession, isError, isLoading };
 
     const errMessage = isError ? <Alert message="Alert! Alert! Alert!" description="Problems...." type="info" /> : null;
 
     const loading = isLoading && !isError ? <Spin tip="Loading..." /> : null;
 
-    const foundMovies = notFound ? <Empty /> : <CinemaList movie={movie} isLoading={isLoading} isError={isError} />;
+    const search = tab === '1' ? <Search searchQueryChange={this.searchQueryChange} /> : null;
+
+    const foundMovies = notFound ? (
+      <Empty />
+    ) : (
+      <CinemaList
+        movie={movie}
+        isLoading={isLoading}
+        isError={isError}
+        guestSession={guestSession}
+        tab={tab}
+        ratedFilm={ratedFilm}
+      />
+    );
 
     const pagination =
       totalPages > 0 && !isLoading ? (
         <Pagination defaultCurrent={1} current={numberPage} total={totalPages} onChange={this.changePage} />
       ) : null;
+
     if (Online) {
       return (
         <Provider value={CinContext}>
           <div className="container">
+            <HeaderTabs changeTab={this.changeTab} />
             <Layout>
-              <Search searchChange={this.searchChange} />
+              {search}
               <Content className="ant-layout">
                 {errMessage}
                 {loading}

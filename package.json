@@ -8,6 +8,7 @@
     "antd": "^4.21.5",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
+    "classnames": "^2.3.1",
     "date-fns": "^2.28.0",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
@@ -15,6 +16,8 @@
     "react-detect-offline": "^2.4.5",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "store": "^2.0.12",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

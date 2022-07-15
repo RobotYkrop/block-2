@@ -15,8 +15,13 @@
   background-color: #fff;
 }
 .container .ant-layout {
-  margin-top: 2em;
   min-height: 100vh;
   background: #ffffff;
   align-items: center;
+}
+.ant-layout-content {
+  margin-top: 2em;
+}
+.ant-tabs-nav-wrap {
+  justify-content: center;
 }
