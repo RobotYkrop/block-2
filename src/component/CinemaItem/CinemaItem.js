@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Tag } from 'antd';
 import { uniqueId } from 'lodash';
+import classNames from 'classnames';
 
 import './CinemaItem.css';
 import RateSystem from '../RateSystem/Rate';
@@ -19,17 +20,12 @@ export default class CinemaItem extends React.Component {
       const overviewTrunc = this.minify(overview, 150);
       let posterPath = `https://image.tmdb.org/t/p/original${poster}`;
 
-      let сlasses = 'card-popularity-count';
-
-      if (popularity >= 3 && popularity < 5) {
-        сlasses += ' orange';
-      }
-      if (popularity >= 5 && popularity < 7) {
-        сlasses += ' yellow';
-      }
-      if (popularity >= 7) {
-        сlasses += ' green';
-      }
+      let сlasses = classNames({
+        'card-popularity-count': true,
+        orange: popularity >= 3 && popularity < 5,
+        yellow: popularity >= 5 && popularity < 7,
+        green: popularity >= 7,
+      });
 
       const filmGenres = genres.map((tag) => {
         return (
