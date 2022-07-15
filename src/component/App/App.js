@@ -80,6 +80,8 @@ export default class App extends React.PureComponent {
     });
   };
 
+  // Получение гостевой сессии
+
   getGuestSession = () => {
     this.getApi
       .guestSession()
@@ -93,6 +95,7 @@ export default class App extends React.PureComponent {
       .catch(this.onError);
   };
 
+  // Поисковая строка
   searchMovies = () => {
     const { searchQuery, numberPage } = this.state;
     this.setState({
@@ -155,6 +158,32 @@ export default class App extends React.PureComponent {
     );
   };
 
+  changeTab = (key) => {
+    if (key === '2') {
+      this.setState(
+        {
+          tab: key,
+          numberPage: 1,
+        },
+        () => {
+          this.getRated();
+        }
+      );
+    } else {
+      this.setState(
+        {
+          isLoading: false,
+          notFound: false,
+          tab: key,
+          numberPage: 1,
+        },
+        () => {
+          this.getMovies();
+        }
+      );
+    }
+  };
+
   addMovieToList = (item) => {
     const newItem = this.createMovie(item);
     this.setState(({ movie }) => {
@@ -187,32 +216,6 @@ export default class App extends React.PureComponent {
       }
     });
     return arr;
-  };
-
-  changeTab = (key) => {
-    if (key === '2') {
-      this.setState(
-        {
-          tab: key,
-          numberPage: 1,
-        },
-        () => {
-          this.getRated();
-        }
-      );
-    } else {
-      this.setState(
-        {
-          isLoading: false,
-          notFound: false,
-          tab: key,
-          numberPage: 1,
-        },
-        () => {
-          this.getMovies();
-        }
-      );
-    }
   };
 
   addRatedItemToList = (item) => {
@@ -279,18 +282,7 @@ export default class App extends React.PureComponent {
 
     const search = tab === '1' ? <Search searchQueryChange={this.searchQueryChange} /> : null;
 
-    const foundMovies = notFound ? (
-      <Empty />
-    ) : (
-      <CinemaList
-        movie={movie}
-        isLoading={isLoading}
-        isError={isError}
-        guestSession={guestSession}
-        tab={tab}
-        ratedFilm={ratedFilm}
-      />
-    );
+    const foundMovies = notFound ? <Empty /> : <CinemaList />;
 
     const pagination =
       totalPages > 0 && !isLoading ? (

@@ -16,7 +16,6 @@ export default class RateSystem extends React.Component {
     this.setState({
       rating: rate,
     });
-    if (rate === 0) getApi.deleteRate(id, guestSession);
     getApi.setRating(id, guestSession, rate);
     store.set(`${id}`, `${rate}`);
   };
