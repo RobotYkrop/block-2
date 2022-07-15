@@ -1,1 +1,1 @@
-Vercel: https://block-2-git-master-robotykrop.vercel.app
+Vercel: https://block-2.vercel.app
