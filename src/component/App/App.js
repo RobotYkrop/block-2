@@ -30,12 +30,12 @@ export default class App extends React.PureComponent {
   };
 
   componentDidMount() {
-    if (!store.get('guestSession')) {
-      this.getGuestSession();
-    } else {
+    if (store.get('guestSession')) {
       this.setState({
         guestSession: store.get('guestSession'),
       });
+    } else {
+      this.getGuestSession();
     }
     this.getMovies();
   }
@@ -44,7 +44,6 @@ export default class App extends React.PureComponent {
     const { numberPage } = this.state;
     this.setState({
       movies: [],
-      isLoading: true,
       notFound: false,
       isError: false,
     });
@@ -81,7 +80,6 @@ export default class App extends React.PureComponent {
   };
 
   // Получение гостевой сессии
-
   getGuestSession = () => {
     this.getApi
       .guestSession()
@@ -104,7 +102,6 @@ export default class App extends React.PureComponent {
       notFound: false,
       isError: false,
     });
-
     if (searchQuery === '') {
       this.getMovies();
     } else {
@@ -143,13 +140,12 @@ export default class App extends React.PureComponent {
   };
 
   changePage = (page) => {
-    const { tab } = this.state;
     this.setState(
       {
         numberPage: page,
       },
       () => {
-        if (tab === '1') {
+        if (this.state.tab === '1') {
           this.searchMovies();
         } else {
           this.getRated();
@@ -162,6 +158,8 @@ export default class App extends React.PureComponent {
     if (key === '2') {
       this.setState(
         {
+          isLoading: false,
+          notFound: false,
           tab: key,
           numberPage: 1,
         },
@@ -170,17 +168,12 @@ export default class App extends React.PureComponent {
         }
       );
     } else {
-      this.setState(
-        {
-          isLoading: false,
-          notFound: false,
-          tab: key,
-          numberPage: 1,
-        },
-        () => {
-          this.getMovies();
-        }
-      );
+      this.setState({
+        isLoading: false,
+        notFound: false,
+        tab: key,
+        numberPage: this.searchMovies(),
+      });
     }
   };
 
@@ -263,11 +256,11 @@ export default class App extends React.PureComponent {
       id: item.id,
       poster: `https://image.tmdb.org/t/p/original${item.poster_path}`,
       title: item.title || 'Not title',
-      releaseDate: item.release_date ? format(parseISO(item.release_date), 'MMMM dd, yyyy') : 'no release date',
+      releaseDate: item.release_date ? format(parseISO(item.release_date), 'MMMM dd, yyyy') : 'Not date',
       overview: item.overview || 'Not overview',
       genres: this.mapGenresList(item.genre_ids),
       rating: store.get(`${item.id}`) || item.rating || 'Not rating',
-      popularity: item.vote_average || 'Not rating',
+      popularity: item.vote_average || 0,
     };
   };
 
@@ -280,7 +273,7 @@ export default class App extends React.PureComponent {
 
     const loading = isLoading && !isError ? <Spin tip="Loading..." /> : null;
 
-    const search = tab === '1' ? <Search searchQueryChange={this.searchQueryChange} /> : null;
+    const search = tab === '1' ? <Search searchChange={this.searchChange} /> : null;
 
     const foundMovies = notFound ? <Empty /> : <CinemaList />;
 
