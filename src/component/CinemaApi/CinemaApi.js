@@ -10,7 +10,7 @@ export default class CinemaApi {
     return await res.json();
   };
 
-  getPopularMovies = async (pageNumber = 1) => {
+  getPopularMovies = async (pageNumber = 2) => {
     return await this.getApi(`movie/popular?${this._apiKey}&include_adult=false&language=en-US&page=${pageNumber}`);
   };
 
@@ -18,7 +18,7 @@ export default class CinemaApi {
     return await this.getApi(`search/movie?${this._apiKey}&include_adult=false&page=${pageNumber}&query=${query}`);
   };
 
-  getRated = async (guestSessionToken, pageNumber = 1) => {
+  getRated = async (guestSessionToken, pageNumber = 2) => {
     return await this.getApi(`guest_session/${guestSessionToken}/rated/movies?${this._apiKey}&page=${pageNumber}`);
   };
 

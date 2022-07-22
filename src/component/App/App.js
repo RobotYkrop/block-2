@@ -22,7 +22,7 @@ export default class App extends React.PureComponent {
     isLoading: true,
     isError: false,
     notFound: false,
-    searchQuery: '',
+    searchQuery: '' ?? JSON.parse(localStorage.getItem('search')),
     guestSession: '',
     numberPage: 1,
     totalPages: 0,
@@ -109,6 +109,7 @@ export default class App extends React.PureComponent {
         .getSearchMovie(searchQuery, numberPage)
         .then((item) => {
           this.setState({
+            searchQuery,
             isLoading: false,
             totalPages: item.total_pages,
             numberPage,
@@ -158,7 +159,7 @@ export default class App extends React.PureComponent {
     if (key === '2') {
       this.setState(
         {
-          isLoading: false,
+          isLoading: true,
           notFound: false,
           tab: key,
           numberPage: 1,
@@ -169,7 +170,7 @@ export default class App extends React.PureComponent {
       );
     } else {
       this.setState({
-        isLoading: false,
+        isLoading: true,
         notFound: false,
         tab: key,
         numberPage: this.searchMovies(),
@@ -266,7 +267,6 @@ export default class App extends React.PureComponent {
 
   render() {
     const { movie, isLoading, isError, numberPage, totalPages, notFound, guestSession, tab, ratedFilm } = this.state;
-
     const CinContext = { movie, ratedFilm, tab, guestSession, isError, isLoading };
 
     const errMessage = isError ? <Alert message="Alert! Alert! Alert!" description="Problems...." type="info" /> : null;
@@ -279,7 +279,13 @@ export default class App extends React.PureComponent {
 
     const pagination =
       totalPages > 0 && !isLoading ? (
-        <Pagination defaultCurrent={1} current={numberPage} total={totalPages} onChange={this.changePage} />
+        <Pagination
+          defaultCurrent={1}
+          current={numberPage}
+          total={totalPages}
+          showSizeChanger={false}
+          onChange={this.changePage}
+        />
       ) : null;
 
     if (Online) {

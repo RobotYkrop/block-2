@@ -38,7 +38,7 @@ export default class CinemaItem extends React.Component {
         <li key={uniqueId()}>
           <Card hoverable>
             <img className="card-img" src={posterPath} alt={`Not poster(${title})`} />
-            <span className={сlasses}>{popularity}</span>
+            <span className={сlasses}>{popularity.toFixed(1)}</span>
             <div>
               <h1 className="card-title">{title}</h1>
               <span className="card-date">{releaseDate}</span>
