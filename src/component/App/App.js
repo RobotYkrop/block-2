@@ -21,8 +21,7 @@ export default class App extends React.PureComponent {
     ratedFilm: [],
     isLoading: true,
     isError: false,
-    notFound: false,
-    searchQuery: '' ?? JSON.parse(localStorage.getItem('search')),
+    searchQuery: '',
     guestSession: '',
     numberPage: 1,
     totalPages: 0,
@@ -43,14 +42,14 @@ export default class App extends React.PureComponent {
   getMovies = () => {
     const { numberPage } = this.state;
     this.setState({
-      movies: [],
-      notFound: false,
+      movie: [],
       isError: false,
     });
     this.getGenresList();
     this.getApi
       .getPopularMovies(numberPage)
       .then((item) => {
+        console.log(item);
         this.setState({
           isLoading: false,
           totalPages: item.total_pages,
@@ -59,7 +58,6 @@ export default class App extends React.PureComponent {
         if (item.results.length === 0) {
           this.setState({
             isLoading: false,
-            notFound: true,
           });
         }
         item.results.forEach((elm) => {
@@ -70,13 +68,7 @@ export default class App extends React.PureComponent {
   };
 
   onError = () => {
-    this.setState(() => {
-      return {
-        isError: true,
-        isLoading: false,
-        notFound: false,
-      };
-    });
+    return <Alert message="Alert! Alert! Alert!" description="Problems...." type="info" />;
   };
 
   // Получение гостевой сессии
@@ -99,7 +91,6 @@ export default class App extends React.PureComponent {
     this.setState({
       movie: [],
       isLoading: true,
-      notFound: false,
       isError: false,
     });
     if (searchQuery === '') {
@@ -109,7 +100,7 @@ export default class App extends React.PureComponent {
         .getSearchMovie(searchQuery, numberPage)
         .then((item) => {
           this.setState({
-            searchQuery,
+            searchQuery: JSON.parse(localStorage.getItem('search')),
             isLoading: false,
             totalPages: item.total_pages,
             numberPage,
@@ -117,7 +108,6 @@ export default class App extends React.PureComponent {
           if (item.results.length === 0) {
             this.setState({
               isLoading: false,
-              notFound: true,
             });
           }
           item.results.forEach((elm) => {
@@ -149,7 +139,7 @@ export default class App extends React.PureComponent {
         if (this.state.tab === '1') {
           this.searchMovies();
         } else {
-          this.getRated();
+          this.getRatedMovie();
         }
       }
     );
@@ -159,22 +149,21 @@ export default class App extends React.PureComponent {
     if (key === '2') {
       this.setState(
         {
-          isLoading: true,
-          notFound: false,
+          isLoading: false,
           tab: key,
           numberPage: 1,
         },
-        () => {
-          this.getRated();
-        }
+        () => this.getRatedMovie()
       );
     } else {
-      this.setState({
-        isLoading: true,
-        notFound: false,
-        tab: key,
-        numberPage: this.searchMovies(),
-      });
+      this.setState(
+        {
+          isLoading: false,
+          tab: key,
+          numberPage: 1,
+        },
+        () => this.searchMovies()
+      );
     }
   };
 
@@ -183,8 +172,8 @@ export default class App extends React.PureComponent {
     this.setState(({ movie }) => {
       const newData = [...movie, newItem];
       return {
-        movie: newData,
         isLoading: false,
+        movie: newData,
       };
     });
   };
@@ -218,31 +207,30 @@ export default class App extends React.PureComponent {
     this.setState(({ ratedFilm }) => {
       const newData = [...ratedFilm, newItem];
       return {
-        ratedFilm: newData,
         isLoading: false,
+        ratedFilm: newData,
       };
     });
   };
 
-  getRated = () => {
+  getRatedMovie = () => {
     const { guestSession, numberPage } = this.state;
     this.setState({
       ratedFilm: [],
       isLoading: true,
-      notFound: false,
       isError: false,
     });
     this.getApi
       .getRated(guestSession, numberPage)
       .then((item) => {
         this.setState({
-          totalPages: item.total_pages,
+          isLoading: false,
+          totalPages: item.total_pages * 10,
           numberPage,
         });
         if (item.results.length === 0) {
           this.setState({
             isLoading: false,
-            notFound: true,
           });
         }
         item.results.forEach((elm) => {
@@ -264,28 +252,19 @@ export default class App extends React.PureComponent {
       popularity: item.vote_average || 0,
     };
   };
-
   render() {
-    const { movie, isLoading, isError, numberPage, totalPages, notFound, guestSession, tab, ratedFilm } = this.state;
-    const CinContext = { movie, ratedFilm, tab, guestSession, isError, isLoading };
-
-    const errMessage = isError ? <Alert message="Alert! Alert! Alert!" description="Problems...." type="info" /> : null;
+    const { movie, isLoading, isError, numberPage, totalPages, guestSession, tab, ratedFilm } = this.state;
+    const CinContext = { movie, ratedFilm, tab, guestSession, isError, isLoading, totalPages };
 
     const loading = isLoading && !isError ? <Spin tip="Loading..." /> : null;
 
     const search = tab === '1' ? <Search searchChange={this.searchChange} /> : null;
 
-    const foundMovies = notFound ? <Empty /> : <CinemaList />;
+    const foundMovies = totalPages === 0 ? <Empty /> : <CinemaList />;
 
     const pagination =
       totalPages > 0 && !isLoading ? (
-        <Pagination
-          defaultCurrent={1}
-          current={numberPage}
-          total={totalPages}
-          showSizeChanger={false}
-          onChange={this.changePage}
-        />
+        <Pagination current={numberPage} total={totalPages} showSizeChanger={false} onChange={this.changePage} />
       ) : null;
 
     if (Online) {
@@ -296,7 +275,6 @@ export default class App extends React.PureComponent {
             <Layout>
               {search}
               <Content className="ant-layout">
-                {errMessage}
                 {loading}
                 {foundMovies}
                 {pagination}

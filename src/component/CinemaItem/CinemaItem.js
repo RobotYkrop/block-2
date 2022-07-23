@@ -14,7 +14,6 @@ export default class CinemaItem extends React.Component {
   render() {
     const { movie, ratedFilm, tab, guestSession } = this.props;
     const movieData = tab === '1' ? movie : ratedFilm;
-
     const elements = movieData.map((movie) => {
       const { id, title, releaseDate, overview, poster, genres, rating, popularity } = movie;
       const overviewTrunc = this.minify(overview, 150);
